@@ -55,7 +55,7 @@ const App = () => (
               <Route path="/profile" element={<Profile />} />
               <Route path="/help" element={<Help />} />
             </Route>
-            <Route path="*" element={<NotFound />} />
+            <Route path="*" element={<Login />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
