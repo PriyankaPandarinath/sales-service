@@ -5,14 +5,11 @@ import {
   CheckCircle2,
   XCircle,
   Timer,
-  AlertCircle,
-  Download,
-  Filter,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import {
@@ -33,87 +30,52 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
-// Mock attendance data
+/* ================= MOCK ATTENDANCE DATA ================= */
+
 const attendanceData = [
   {
     id: '1',
-    employeeId: 'SSSPL001',
-    name: 'Rajesh Kumar Singh',
     date: '2026-01-12',
     inTime: '09:05',
     outTime: '18:30',
     totalHours: 9.42,
-    shift: 'General',
     status: 'present',
     lateBy: 5,
     overtime: 30,
   },
   {
     id: '2',
-    employeeId: 'SSSPL002',
-    name: 'Priya Sharma',
-    date: '2026-01-12',
-    inTime: '09:00',
-    outTime: '18:00',
-    totalHours: 9,
-    shift: 'General',
-    status: 'present',
-    lateBy: 0,
-    overtime: 0,
-  },
-  {
-    id: '3',
-    employeeId: 'SSSPL003',
-    name: 'Amit Patel',
-    date: '2026-01-12',
+    date: '2026-01-11',
     inTime: '09:45',
     outTime: '18:15',
     totalHours: 8.5,
-    shift: 'General',
     status: 'late',
     lateBy: 45,
     overtime: 15,
   },
   {
-    id: '4',
-    employeeId: 'SSSPL004',
-    name: 'Sneha Reddy',
-    date: '2026-01-12',
+    id: '3',
+    date: '2026-01-10',
     inTime: '-',
     outTime: '-',
     totalHours: 0,
-    shift: 'General',
     status: 'absent',
     lateBy: 0,
     overtime: 0,
   },
   {
-    id: '5',
-    employeeId: 'SSSPL005',
-    name: 'Vikram Joshi',
-    date: '2026-01-12',
-    inTime: '09:00',
-    outTime: '13:00',
-    totalHours: 4,
-    shift: 'General',
-    status: 'half-day',
-    lateBy: 0,
-    overtime: 0,
-  },
-  {
-    id: '6',
-    employeeId: 'SSSPL006',
-    name: 'Ananya Gupta',
-    date: '2026-01-12',
+    id: '4',
+    date: '2026-01-09',
     inTime: '-',
     outTime: '-',
     totalHours: 0,
-    shift: 'General',
     status: 'on-leave',
     lateBy: 0,
     overtime: 0,
   },
 ];
+
+/* ================= STATS (UNCHANGED) ================= */
 
 const statsCards = [
   {
@@ -146,26 +108,33 @@ const statsCards = [
   },
 ];
 
+/* ================= DATE FORMAT HELPER ================= */
+
+const formatDateDDMMYYYY = (dateStr: string) => {
+  const d = new Date(dateStr);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${day}-${month}-${year}`;
+};
+
 const Attendance: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const { toast } = useToast();
   const { user } = useAuth();
 
   const handlePunchIn = () => {
-    const now = new Date();
     toast({
       title: 'Punched In Successfully',
-      description: `You have punched in at ${now.toLocaleTimeString('en-IN')}`,
+      description: `You have punched in at ${new Date().toLocaleTimeString('en-IN')}`,
     });
   };
 
   const handlePunchOut = () => {
-    const now = new Date();
     toast({
       title: 'Punched Out Successfully',
-      description: `You have punched out at ${now.toLocaleTimeString('en-IN')}`,
+      description: `You have punched out at ${new Date().toLocaleTimeString('en-IN')}`,
     });
   };
 
@@ -177,8 +146,6 @@ const Attendance: React.FC = () => {
         return <Badge className="badge-destructive">Absent</Badge>;
       case 'late':
         return <Badge className="badge-warning">Late</Badge>;
-      case 'half-day':
-        return <Badge className="badge-info">Half Day</Badge>;
       case 'on-leave':
         return <Badge variant="secondary">On Leave</Badge>;
       default:
@@ -186,12 +153,12 @@ const Attendance: React.FC = () => {
     }
   };
 
+  /* ================= FILTER FIX ================= */
+
   const filteredData = attendanceData.filter((record) => {
-    const matchesSearch =
-      record.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      record.employeeId.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesDate = selectedDate ? record.date === selectedDate : true;
     const matchesStatus = statusFilter === 'all' || record.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    return matchesDate && matchesStatus;
   });
 
   return (
@@ -202,28 +169,15 @@ const Attendance: React.FC = () => {
           <h1 className="text-2xl font-bold">Attendance</h1>
           <p className="text-muted-foreground">Track and manage daily attendance</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Input
-            type="text"
-            value={selectedDate}
-            // onChange={(e) => setSelectedDate(e.target.value)}
-            className="w-[160px]"
-          />
-          {/* <Button variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button> */}
-        </div>
+        
       </div>
 
-      {/* Punch In/Out Card - For Employees */}
+      {/* Punch In / Out */}
       <Card className="bg-gradient-to-r from-primary/5 to-accent/5 border-accent/20">
         <CardContent className="p-6">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-6">
-              <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center">
-                <Clock className="h-8 w-8 text-accent" />
-              </div>
+              <Clock className="h-8 w-8 text-accent" />
               <div>
                 <h2 className="text-xl font-semibold">
                   {new Date().toLocaleDateString('en-IN', {
@@ -241,22 +195,7 @@ const Attendance: React.FC = () => {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground">In Time</p>
-                <p className="text-lg font-semibold text-success">09:05</p>
-              </div>
-              <div className="w-px h-12 bg-border" />
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground">Out Time</p>
-                <p className="text-lg font-semibold text-muted-foreground">--:--</p>
-              </div>
-              <div className="w-px h-12 bg-border" />
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground">Working Hours</p>
-                <p className="text-lg font-semibold">5h 30m</p>
-              </div>
-            </div>
+
             <div className="flex gap-2">
               <Button onClick={handlePunchIn} className="bg-success hover:bg-success/90" disabled>
                 <CheckCircle2 className="h-4 w-4 mr-2" />
@@ -271,7 +210,7 @@ const Attendance: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Stats */}
+      {/* Stats (UNCHANGED) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statsCards.map((stat, index) => (
           <Card key={index} className="card-hover">
@@ -291,53 +230,76 @@ const Attendance: React.FC = () => {
         ))}
       </div>
 
-      {/* Filters */}
       <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Input
-                placeholder="Search by name or ID..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="present">Present</SelectItem>
-                <SelectItem value="absent">Absent</SelectItem>
-                <SelectItem value="late">Late</SelectItem>
-                <SelectItem value="half-day">Half Day</SelectItem>
-                <SelectItem value="on-leave">On Leave</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+  <CardHeader className="pb-2">
+    <CardTitle className="text-base font-semibold">
+      Filter Attendance
+    </CardTitle>
+  </CardHeader>
+
+  <CardContent className="p-4">
+    <div className="flex flex-col sm:flex-row sm:items-end gap-3">
+      
+      {/* Date Filter */}
+      <div className="flex flex-col gap-1">
+        <label className="text-xs text-muted-foreground">
+          Date
+        </label>
+        <Input
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+          className="w-full sm:w-[160px]"
+        />
+      </div>
+
+      {/* Status Filter */}
+      <div className="flex flex-col gap-1">
+        <label className="text-xs text-muted-foreground">
+          Status
+        </label>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-full sm:w-[150px]">
+            <SelectValue placeholder="All Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="present">Present</SelectItem>
+            <SelectItem value="absent">Absent</SelectItem>
+            <SelectItem value="late">Late</SelectItem>
+            <SelectItem value="on-leave">On Leave</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Clear Button */}
+      {selectedDate && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="self-start sm:self-end"
+          onClick={() => setSelectedDate('')}
+        >
+          Clear
+        </Button>
+      )}
+    </div>
+  </CardContent>
+</Card>
+
 
       {/* Attendance Table */}
       <Card>
         <CardHeader>
           <CardTitle>Daily Attendance Register</CardTitle>
-          <CardDescription>
-            Attendance records for {new Date(selectedDate).toLocaleDateString('en-IN', {
-              weekday: 'long',
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
-            })}
-          </CardDescription>
         </CardHeader>
+
         <CardContent>
           <div className="rounded-lg border overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/50">
-                  <TableHead>Employee</TableHead>
+                  <TableHead>Date</TableHead>
                   <TableHead>In Time</TableHead>
                   <TableHead>Out Time</TableHead>
                   <TableHead>Working Hours</TableHead>
@@ -346,57 +308,55 @@ const Attendance: React.FC = () => {
                   <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
+
               <TableBody>
-                {filteredData.map((record) => (
-                  <TableRow key={record.id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{record.name}</p>
-                        <p className="text-sm text-muted-foreground">{record.employeeId}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className={record.inTime === '-' ? 'text-muted-foreground' : 'font-medium'}>
-                        {record.inTime}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span className={record.outTime === '-' ? 'text-muted-foreground' : 'font-medium'}>
-                        {record.outTime}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="font-medium">
-                        {record.totalHours > 0 ? `${record.totalHours.toFixed(1)}h` : '-'}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      {record.lateBy > 0 ? (
-                        <span className="text-warning font-medium">{record.lateBy} min</span>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {record.overtime > 0 ? (
-                        <span className="text-success font-medium">{record.overtime} min</span>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell>{getStatusBadge(record.status)}</TableCell>
-                  </TableRow>
-                ))}
+                {filteredData.map((record) => {
+                  const day = new Date(record.date).toLocaleDateString('en-IN', {
+                    weekday: 'long',
+                  });
+
+                  return (
+                    <TableRow key={record.id}>
+                      <TableCell>
+                        <p className="font-medium">
+                          {formatDateDDMMYYYY(record.date)}
+                        </p>
+                        <p className="text-sm text-muted-foreground">{day}</p>
+                      </TableCell>
+                      <TableCell>{record.inTime}</TableCell>
+                      <TableCell>{record.outTime}</TableCell>
+                      <TableCell>
+                        {record.totalHours > 0
+                          ? `${record.totalHours.toFixed(1)}h`
+                          : '-'}
+                      </TableCell>
+                      <TableCell>
+                        {record.lateBy > 0 ? (
+                          <span className="text-warning">{record.lateBy} min</span>
+                        ) : (
+                          '-'
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {record.overtime > 0 ? (
+                          <span className="text-success">{record.overtime} min</span>
+                        ) : (
+                          '-'
+                        )}
+                      </TableCell>
+                      <TableCell>{getStatusBadge(record.status)}</TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>
 
-          {/* Pagination */}
           <div className="flex items-center justify-between mt-4">
             <span className="text-sm text-muted-foreground">
               Showing {filteredData.length} records
             </span>
-            <div className="flex items-center gap-2">
+            <div className="flex gap-2">
               <Button variant="outline" size="sm" disabled>
                 <ChevronLeft className="h-4 w-4 mr-1" />
                 Previous

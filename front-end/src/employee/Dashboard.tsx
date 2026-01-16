@@ -106,6 +106,47 @@ const EmployeeDashboard: React.FC = () => {
         </Card>
       </div>
 
+      {/* 🔹 ADDED STATS ABOVE LEAVE BALANCE (ONLY ADDITION) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3">
+              <Clock className="text-primary" />
+              <div>
+                <p className="text-sm text-muted-foreground">Working Hours Today</p>
+                <p className="font-semibold">{attendanceSummary.workingHours}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3">
+              <CheckCircle2 className="text-success" />
+              <div>
+                <p className="text-sm text-muted-foreground">Attendance %</p>
+                <p className="font-semibold">{attendanceSummary.monthlyAttendance}%</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-5">
+            <div className="flex items-center gap-3">
+              <Calendar className="text-info" />
+              <div>
+                <p className="text-sm text-muted-foreground">Leaves Used</p>
+                <p className="font-semibold">
+                  {leaveBalances.reduce((acc, l) => acc + l.used, 0)}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Leave Balance */}
       <Card>
         <CardHeader>
@@ -124,7 +165,6 @@ const EmployeeDashboard: React.FC = () => {
               <Progress value={((leave.total - leave.used) / leave.total) * 100} />
             </div>
           ))}
-          {/* <Button onClick={() => navigate('/leave')} className="w-full mt-3">Apply Leave</Button> */}
         </CardContent>
       </Card>
 

@@ -11,7 +11,16 @@ import Employees from "@/employee/Employees";
 import Attendance from "@/employee/Attendance";
 import Leave from "@/employee/Leave";
 import Payroll from "@/employee/Payroll";
+import Performance from "@/employee/Performance";
+
 import NotFound from "./employee/NotFound";
+import Assets from "./employee/Assests";
+import Training from "./employee/Training";
+import TravelExpense from "./employee/TravelExpense";
+import Grievance from "./employee/Grievance";
+import Settings from "./employee/Settings";
+import Profile from "./employee/Profile";
+import Help from "./components/Help";
 
 const queryClient = new QueryClient();
 
@@ -33,17 +42,18 @@ const App = () => (
               <Route path="/payroll" element={<Payroll />} />
               <Route path="/organization" element={<Dashboard />} />
               <Route path="/recruitment" element={<Dashboard />} />
-              <Route path="/performance" element={<Dashboard />} />
-              <Route path="/training" element={<Dashboard />} />
-              <Route path="/assets" element={<Dashboard />} />
-              <Route path="/travel" element={<Dashboard />} />
+              <Route path="/performance" element={<Performance />} />
+              <Route path="/training" element={<Training />} />
+              <Route path="/assets" element={<Assets />} />
+              <Route path="/travel" element={<TravelExpense />} />
               <Route path="/disciplinary" element={<Dashboard />} />
-              <Route path="/grievance" element={<Dashboard />} />
+              <Route path="/grievance" element={<Grievance />} />
               <Route path="/separation" element={<Dashboard />} />
               <Route path="/compliance" element={<Dashboard />} />
               <Route path="/reports" element={<Dashboard />} />
-              <Route path="/settings" element={<Dashboard />} />
-              <Route path="/profile" element={<Dashboard />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/help" element={<Help />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

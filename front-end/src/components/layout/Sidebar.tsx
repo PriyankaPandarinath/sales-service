@@ -43,7 +43,7 @@ const navItems: NavItem[] = [
   // { title: 'Employees', href: '/employees', icon: Users },
   { title: 'Attendance', href: '/attendance', icon: Clock },
   { title: 'Leave', href: '/leave', icon: Calendar, badge: '3' },
-  { title: 'Payroll', href: '/payroll', icon: Wallet, roles: ['admin', 'hr', 'accounts'] },
+  { title: 'Payroll', href: '/payroll', icon: Wallet, roles: ['admin', 'hr', 'accounts', 'employee'] },
   { title: 'Recruitment', href: '/recruitment', icon: UserPlus, roles: ['admin', 'hr'] },
   { title: 'Performance', href: '/performance', icon: Target },
   { title: 'Training', href: '/training', icon: GraduationCap },

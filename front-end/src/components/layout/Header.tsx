@@ -114,9 +114,49 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, isSidebarCollapsed }) => {
         </DropdownMenu>
 
         {/* Help */}
-        <Button variant="ghost" size="icon" className="hidden sm:flex">
-          <HelpCircle className="h-5 w-5" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="hidden sm:flex">
+              <HelpCircle className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent align="end" className="w-64">
+            <DropdownMenuLabel>Help & Support</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => navigate('/help')}
+            >
+              📘 <span className="ml-2">Help Center</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => navigate('/help')}
+            >
+              📄 <span className="ml-2">User Guide</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => navigate('/help')}
+            >
+              🐞 <span className="ml-2">Report an Issue</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => navigate('/help')}
+            >
+              ℹ️ <span className="ml-2">About</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
 
         {/* User menu */}
         <DropdownMenu>

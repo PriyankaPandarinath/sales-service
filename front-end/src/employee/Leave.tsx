@@ -52,6 +52,7 @@ const leaveBalance = [
 const leaveRequests = [
   {
     id: '1',
+    leaveId: 'LV-2026-001',
     employeeId: 'SSSPL001',
     employeeName: 'Rajesh Kumar Singh',
     leaveType: 'Casual Leave',
@@ -64,8 +65,9 @@ const leaveRequests = [
   },
   {
     id: '2',
-    employeeId: 'SSSPL002',
-    employeeName: 'Priya Sharma',
+    leaveId: 'LV-2026-002',
+    employeeId: 'SSSPL001',
+    employeeName: 'Rajesh Kumar Singh',
     leaveType: 'Sick Leave',
     fromDate: '2026-01-08',
     toDate: '2026-01-08',
@@ -73,12 +75,12 @@ const leaveRequests = [
     reason: 'Not feeling well',
     status: 'approved',
     appliedOn: '2026-01-07',
-    approvedBy: 'HR Manager',
   },
   {
     id: '3',
-    employeeId: 'SSSPL003',
-    employeeName: 'Amit Patel',
+    leaveId: 'LV-2026-003',
+    employeeId: 'SSSPL002',
+    employeeName: 'Priya Sharma',
     leaveType: 'Earned Leave',
     fromDate: '2026-01-20',
     toDate: '2026-01-25',
@@ -86,32 +88,6 @@ const leaveRequests = [
     reason: 'Vacation',
     status: 'approved',
     appliedOn: '2026-01-05',
-    approvedBy: 'Director',
-  },
-  {
-    id: '4',
-    employeeId: 'SSSPL004',
-    employeeName: 'Sneha Reddy',
-    leaveType: 'Casual Leave',
-    fromDate: '2026-01-12',
-    toDate: '2026-01-13',
-    days: 2,
-    reason: 'Personal work',
-    status: 'rejected',
-    appliedOn: '2026-01-09',
-    remarks: 'Critical project deadline',
-  },
-  {
-    id: '5',
-    employeeId: 'SSSPL005',
-    employeeName: 'Vikram Joshi',
-    leaveType: 'Compensatory Off',
-    fromDate: '2026-01-14',
-    toDate: '2026-01-14',
-    days: 1,
-    reason: 'Worked on weekend',
-    status: 'pending',
-    appliedOn: '2026-01-11',
   },
 ];
 
@@ -286,7 +262,7 @@ const Leave: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/50">
-                  <TableHead>Employee</TableHead>
+                  <TableHead>Leave ID</TableHead>
                   <TableHead>Leave Type</TableHead>
                   <TableHead>Duration</TableHead>
                   <TableHead>Days</TableHead>
@@ -300,8 +276,8 @@ const Leave: React.FC = () => {
                   <TableRow key={request.id}>
                     <TableCell>
                       <div>
-                        <p className="font-medium">{request.employeeName}</p>
-                        <p className="text-sm text-muted-foreground">{request.employeeId}</p>
+                        <p className="font-medium">{request.leaveId}</p>
+                        <p className="text-sm text-muted-foreground">{request.appliedOn}</p>
                       </div>
                     </TableCell>
                     <TableCell>{request.leaveType}</TableCell>
@@ -460,6 +436,8 @@ const Leave: React.FC = () => {
                       {new Date(selectedRequest.toDate).toLocaleDateString('en-IN')}
                     </p>
                   </div>
+                  
+                  
                   <div className="col-span-2">
                     <p className="text-sm text-muted-foreground">Reason</p>
                     <p className="font-medium">{selectedRequest.reason}</p>
@@ -470,6 +448,7 @@ const Leave: React.FC = () => {
                       {new Date(selectedRequest.appliedOn).toLocaleDateString('en-IN')}
                     </p>
                   </div>
+                  
                 </div>
 
                 {selectedRequest.status === 'pending' && (user?.role === 'admin' || user?.role === 'hr' || user?.role === 'manager') && (
