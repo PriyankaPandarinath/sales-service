@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import MainLayout from "@/components/layout/MainLayout";
 import Login from "@/employee/Login";
-import Dashboard from "@/employee/Dashboard";
+import Dashboard from "@/dashboards/DashboardRouter";
 import Employees from "@/employee/Employees";
 import Attendance from "@/employee/Attendance";
 import Leave from "@/employee/Leave";
@@ -21,6 +21,12 @@ import Grievance from "./employee/Grievance";
 import Settings from "./employee/Settings";
 import Profile from "./employee/Profile";
 import Help from "./components/Help";
+
+import OrganizationLayout from "@/organization/OrganizationLayout";
+import UserManagement from "@/super-admin/UserManagement";
+
+
+
 
 const queryClient = new QueryClient();
 
@@ -40,7 +46,8 @@ const App = () => (
               <Route path="/attendance" element={<Attendance />} />
               <Route path="/leave" element={<Leave />} />
               <Route path="/payroll" element={<Payroll />} />
-              <Route path="/organization" element={<Dashboard />} />
+              {/* <Route path="/organization" element={<Dashboard />} /> */}
+              <Route path="/organization" element={<OrganizationLayout />} />
               <Route path="/recruitment" element={<Dashboard />} />
               <Route path="/performance" element={<Performance />} />
               <Route path="/training" element={<Training />} />
@@ -54,6 +61,7 @@ const App = () => (
               <Route path="/settings" element={<Settings />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/help" element={<Help />} />
+              <Route path="/users" element={<UserManagement />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

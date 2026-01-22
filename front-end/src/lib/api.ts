@@ -435,7 +435,7 @@ import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'ax
  * Make sure this matches your backend
  */
 // const API_BASE_URL =
-//   import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1' || 'https://sales-service-4cgb.onrender.com/api/v1';
+//   import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
 const API_BASE_URL = 'https://sales-service-4cgb.onrender.com/api/v1';
 

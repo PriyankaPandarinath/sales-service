@@ -8,6 +8,7 @@ Base.metadata.create_all(bind=engine)
 db = SessionLocal()
 
 users = [
+    ("superadmin@ssspl.com","superadmin123", "SUPERADMIN"),
     ("admin@ssspl.com", "admin123", "ADMIN"),
     ("employee@ssspl.com", "employee123", "EMPLOYEE"),
 ]
