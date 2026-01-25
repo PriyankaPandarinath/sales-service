@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Search,
   Plus,
@@ -114,7 +114,7 @@ const UserManagement: React.FC = () => {
 
   const allowedTabs: Role[] = isSuperAdmin
     ? ["admin", "hr", "manager"]
-    : ["hr", "manager"];
+    : ["manager"];
 
   /* ---------------- FILTERING ---------------- */
 
@@ -134,7 +134,7 @@ const UserManagement: React.FC = () => {
 
   const canAdd =
     (isSuperAdmin && (activeTab === "admin" || activeTab === "hr")) ||
-    (isAdmin && (activeTab === "hr" || activeTab === "manager"));
+    (isAdmin && (activeTab === "manager"));
 
   /* ---------------- ACTIONS ---------------- */
 
@@ -148,6 +148,13 @@ const UserManagement: React.FC = () => {
     );
     toast({ title: "Status updated" });
   };
+
+  useEffect(() => {
+    // If the active tab is no longer allowed, switch to the first allowed tab
+    if (!allowedTabs.includes(activeTab)) {
+      setActiveTab(allowedTabs[0]);
+    }
+  }, [activeTab, allowedTabs]);
 
   const handleSave = () => {
     toast({ title: "User saved successfully" });
@@ -299,6 +306,10 @@ const UserManagement: React.FC = () => {
               <Label>Phone</Label>
               <Input defaultValue={editing?.phone} />
             </div>
+            <div>
+              <Label>Password</Label>
+              <Input disabled={true} defaultValue={"id.branch.phonenumber"} />
+            </div>
 
             {activeTab === "manager" && (
               <div>
@@ -318,6 +329,8 @@ const UserManagement: React.FC = () => {
               </div>
             )}
 
+            {(activeTab === "manager" || activeTab === "admin" ) && 
+            (
             <div>
               <Label>Branch</Label>
               <Select
@@ -335,7 +348,8 @@ const UserManagement: React.FC = () => {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </div>          )}
+
           </div>
 
           <div className="flex justify-end gap-2 mt-6 pt-4 border-t">

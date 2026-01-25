@@ -47,6 +47,11 @@ const navItems: NavItem[] = [
   { title: 'Payroll', href: '/payroll', icon: Wallet, roles: ['HR'] },
     { title: 'Payroll', href: '/adminpayroll', icon: Wallet, roles: ['ADMIN'] },
 
+    { title: 'Payroll', href: '/epayroll', icon: Wallet, roles: ['EMPLOYEE', 'MANAGER'] },
+
+    { title: 'Payroll', href: '/superadminpayroll', icon: Wallet, roles: ['SUPERADMIN'] },
+
+
   // { title: 'Recruitment', href: '/recruitment', icon: UserPlus, roles: ['HR'] },
   // { title: 'Performance', href: '/performance', icon: Target, roles: ['EMPLOYEE', 'HR', 'MANAGER'] },
   // { title: 'Training', href: '/training', icon: GraduationCap, roles: ['EMPLOYEE', 'HR', 'MANAGER'] },

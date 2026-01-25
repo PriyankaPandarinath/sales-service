@@ -1,226 +1,197 @@
-import React, { useState } from 'react';
-import {
-  ShieldCheck,
-  Eye,
-  Lock,
-  Calendar,
-  User,
-} from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import React, { useState } from "react";
+import { Building2, IndianRupee } from "lucide-react";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
-  TableHead,
-  TableRow,
-  TableHeader,
   TableBody,
   TableCell,
-} from '@/components/ui/table';
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Select,
-  SelectTrigger,
   SelectContent,
   SelectItem,
+  SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
-/* 🔐 MOCK AUDIT DATA – BACKEND WILL REPLACE */
-const payrollAuditLogs = [
+/* 🌍 SAMPLE ORGANIZATION-LEVEL PAYROLL DATA */
+const organizationPayrollData = [
   {
-    id: 'AUD-001',
-    month: 'January',
-    year: '2026',
-    generatedBy: 'Admin-HYD',
-    generatedAt: '2026-02-01 10:45 AM',
-    lockedBy: 'Admin-HYD',
-    lockedAt: '2026-02-01 06:30 PM',
-    employeesProcessed: 42,
-    totalGross: 3850000,
-    totalDeductions: 720000,
-    totalNetPay: 3130000,
-    status: 'LOCKED',
+    organizationId: "ORG001",
+    organizationName: "Vijayawada",
+    month: "January",
+    year: "2026",
+    branchesCount: 5,
+    employeesCount: 120,
+    totalGross: 9800000,
+    totalDeductions: 1620000,
+    totalNetPay: 8180000,
+    payrollStatus: "Completed",
   },
   {
-    id: 'AUD-002',
-    month: 'February',
-    year: '2026',
-    generatedBy: 'Admin-HYD',
-    generatedAt: '2026-03-01 11:10 AM',
-    lockedBy: null,
-    lockedAt: null,
-    employeesProcessed: 44,
-    totalGross: 4010000,
-    totalDeductions: 760000,
-    totalNetPay: 3250000,
-    status: 'DRAFT',
+    organizationId: "ORG002",
+    organizationName: "Hyderabad",
+    month: "January",
+    year: "2026",
+    branchesCount: 3,
+    employeesCount: 58,
+    totalGross: 4200000,
+    totalDeductions: 690000,
+    totalNetPay: 3510000,
+    payrollStatus: "Completed",
+  },
+  {
+    organizationId: "ORG003",
+    organizationName: "Vishakapatnam",
+    month: "January",
+    year: "2026",
+    branchesCount: 2,
+    employeesCount: 34,
+    totalGross: 5600000,
+    totalDeductions: 1100000,
+    totalNetPay: 4500000,
+    payrollStatus: "Pending",
   },
 ];
 
-const months = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-];
-const years = ['2025', '2026'];
-
-const formatINR = (amount: number) =>
-  new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
+/* 💰 Currency Formatter */
+const formatCurrency = (amount: number) =>
+  new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
     maximumFractionDigits: 0,
   }).format(amount);
 
-const PayrollAudit: React.FC = () => {
-  const [month, setMonth] = useState('January');
-  const [year, setYear] = useState('2026');
+const SuperAdminPayroll: React.FC = () => {
+  const [selectedMonth, setSelectedMonth] = useState("January");
+  const [selectedYear, setSelectedYear] = useState("2026");
 
-  const filteredLogs = payrollAuditLogs.filter(
-    (p) => p.month === month && p.year === year
+  const filteredData = organizationPayrollData.filter(
+    o => o.month === selectedMonth && o.year === selectedYear
   );
 
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "Completed":
+        return <Badge className="bg-green-500">Completed</Badge>;
+      case "Pending":
+        return <Badge className="bg-yellow-500">Pending</Badge>;
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
+    }
+  };
+
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* HEADER */}
-      <div className="flex justify-between items-center">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <ShieldCheck className="h-6 w-6 text-primary" />
-            Payroll Audit
-          </h1>
+          <h1 className="text-2xl font-bold">Organization Payroll Overview</h1>
           <p className="text-muted-foreground">
-            Compliance & payroll activity review (Read-only)
+            Consolidated payroll summary per organization
           </p>
         </div>
 
+        {/* Filters */}
         <div className="flex gap-2">
-          <Select value={month} onValueChange={setMonth}>
+          <Select value={selectedMonth} onValueChange={setSelectedMonth}>
             <SelectTrigger className="w-[140px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {months.map((m) => (
-                <SelectItem key={m} value={m}>
-                  {m}
-                </SelectItem>
+              {[
+                "January","February","March","April","May","June",
+                "July","August","September","October","November","December",
+              ].map(m => (
+                <SelectItem key={m} value={m}>{m}</SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <Select value={year} onValueChange={setYear}>
-            <SelectTrigger className="w-[100px]">
+          <Select value={selectedYear} onValueChange={setSelectedYear}>
+            <SelectTrigger className="w-[110px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {years.map((y) => (
-                <SelectItem key={y} value={y}>
-                  {y}
-                </SelectItem>
+              {["2024","2025","2026","2027"].map(y => (
+                <SelectItem key={y} value={y}>{y}</SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
       </div>
 
-      {/* AUDIT TABLE */}
+      {/* Organization Payroll Table */}
       <Card>
         <CardHeader>
-          <CardTitle>
-            Payroll Audit Log – {month} {year}
+          <CardTitle className="flex items-center gap-2">
+            <Building2 className="h-5 w-5" />
+            Payroll Summary — {selectedMonth} {selectedYear}
           </CardTitle>
-          <CardDescription>
-            All payroll actions are system logged and immutable
-          </CardDescription>
         </CardHeader>
 
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Period</TableHead>
-                <TableHead>Generated By</TableHead>
-                <TableHead>Employees</TableHead>
-                <TableHead>Net Pay</TableHead>
+                <TableHead>Branch</TableHead>
+                {/* <TableHead className="text-center">Branches</TableHead> */}
+                <TableHead className="text-center">Employees</TableHead>
+                <TableHead className="text-right">Gross</TableHead>
+                <TableHead className="text-right">Deductions</TableHead>
+                <TableHead className="text-right">Net Pay</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Audit</TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {filteredLogs.map((log) => (
-                <TableRow key={log.id}>
+              {filteredData.map(org => (
+                <TableRow key={org.organizationId}>
                   <TableCell>
-                    <div className="font-medium">
-                      {log.month} {log.year}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      ID: {log.id}
-                    </div>
+                    <p className="font-medium">{org.organizationName}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {org.organizationId}
+                    </p>
                   </TableCell>
-
+                  {/* <TableCell className="text-center">
+                    {org.branchesCount}
+                  </TableCell> */}
+                  <TableCell className="text-center">
+                    {org.employeesCount}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {formatCurrency(org.totalGross)}
+                  </TableCell>
+                  <TableCell className="text-right text-red-600">
+                    -{formatCurrency(org.totalDeductions)}
+                  </TableCell>
+                  <TableCell className="text-right font-semibold text-green-600">
+                    {formatCurrency(org.totalNetPay)}
+                  </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-1">
-                      <User className="h-4 w-4" />
-                      {log.generatedBy}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {log.generatedAt}
-                    </div>
-                  </TableCell>
-
-                  <TableCell>
-                    {log.employeesProcessed}
-                  </TableCell>
-
-                  <TableCell className="font-semibold">
-                    {formatINR(log.totalNetPay)}
-                  </TableCell>
-
-                  <TableCell>
-                    {log.status === 'LOCKED' ? (
-                      <Badge className="badge-destructive">
-                        <Lock className="h-3 w-3 mr-1" />
-                        Locked
-                      </Badge>
-                    ) : (
-                      <Badge className="badge-warning">
-                        Draft
-                      </Badge>
-                    )}
-                  </TableCell>
-
-                  <TableCell>
-                    <Button size="sm" variant="ghost">
-                      <Eye className="h-4 w-4 mr-1" />
-                      View
-                    </Button>
+                    {getStatusBadge(org.payrollStatus)}
                   </TableCell>
                 </TableRow>
               ))}
+
+              {filteredData.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center text-muted-foreground">
+                    No payroll data found
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
-
-          <Separator className="my-4" />
-
-          <p className="text-xs text-muted-foreground">
-            Audit logs are system-generated. No manual changes
-            are allowed. Used for statutory, financial & internal
-            audits.
-          </p>
         </CardContent>
       </Card>
     </div>
   );
 };
 
-export default PayrollAudit;
+export default SuperAdminPayroll;

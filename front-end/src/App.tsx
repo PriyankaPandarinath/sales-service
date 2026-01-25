@@ -28,6 +28,8 @@ import AdminPayroll from "./admin/AdminPayroll";
 
 import OrganizationLayout from "@/organization/OrganizationLayout";
 import UserManagement from "@/super-admin/UserManagement";
+import EmployeePayslips from "./employee/EmployeePayslips";
+import PayrollAudit from "./superadmin/PayrollAudit";
 
 
 
@@ -67,6 +69,8 @@ const App = () => (
               <Route path="/help" element={<Help />} />
               <Route path="/users" element={<UserManagement />} />
               <Route path="/adminpayroll" element={<AdminPayroll />} />
+              <Route path="/epayroll" element={<EmployeePayslips />} />
+              <Route path="/superadminpayroll" element={<PayrollAudit />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

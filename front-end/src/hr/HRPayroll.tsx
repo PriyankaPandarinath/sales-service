@@ -424,6 +424,13 @@ const HRPayroll: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState('2026');
   const [selectedEmployee, setSelectedEmployee] = useState<(typeof monthlyPayrollData)[0] | null>(null);
   const [selectedStructure, setSelectedStructure] = useState<(typeof employeeSalaryStructures)[0] | null>(null);
+
+  const [editingStatutory, setEditingStatutory] =
+  useState<any | null>(null);
+
+  const [selectedStatutoryEmployee, setSelectedStatutoryEmployee] =
+  useState<(typeof employeeSalaryStructures)[0] | null>(null);
+
   const [editingStructure, setEditingStructure] = useState<Partial<(typeof employeeSalaryStructures)[0]> | null>(null);
   const [payrollLocked, setPayrollLocked] = useState<{ [key: string]: boolean }>({});
   const [activeTab, setActiveTab] = useState('processing');
@@ -502,6 +509,41 @@ const HRPayroll: React.FC = () => {
     );
     setSelectedEmployees([]);
   };
+
+
+  const handleStatutoryEditStructure = (employee: any) => {
+  const key = `${employee.employeeId}-${selectedMonth}-${selectedYear}`;
+
+  setSelectedStatutoryEmployee(employee);
+  setEditingStatutory({
+    ...(deductionsData[key] || {
+      pfEmployee: 0,
+      pfEmployer: 0,
+      esicEmployee: 0,
+      esicEmployer: 0,
+      professionalTax: 0,
+      incomeTax: 0,
+      tds: 0,
+    }),
+  });
+};
+
+
+const handleSaveStatutory = () => {
+  if (!selectedStatutoryEmployee || !editingStatutory) return;
+
+  const key = `${selectedStatutoryEmployee.employeeId}-${selectedMonth}-${selectedYear}`;
+
+  setDeductionsData(prev => ({
+    ...prev,
+    [key]: editingStatutory,
+  }));
+
+  setSelectedStatutoryEmployee(null);
+  setEditingStatutory(null);
+};
+
+
 
   const handleLockPayroll = () => {
     const newLocked = !isLocked;
@@ -616,7 +658,7 @@ const HRPayroll: React.FC = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-6">
             <p className="text-sm text-muted-foreground flex items-center"><Users className="h-4 w-4 mr-2" /> Total Employees</p>
@@ -641,14 +683,14 @@ const HRPayroll: React.FC = () => {
             <p className="text-2xl font-bold text-green-600">{formatCurrency(totalNet)}</p>
           </CardContent>
         </Card>
-      </div>
+      </div> */}
 
       {/* Tabs for Sections */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="processing">Payroll Processing</TabsTrigger>
           <TabsTrigger value="structures">Salary Structures</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
+          <TabsTrigger value="statutory">Statutory & Other Deductions</TabsTrigger>
         </TabsList>
 
         {/* Payroll Processing Tab */}
@@ -669,7 +711,7 @@ const HRPayroll: React.FC = () => {
                     onChange={e => setSearchTerm(e.target.value)}
                   />
                 </div>
-                {!isLocked && selectedEmployees.length > 0 && (
+                {/* {!isLocked && selectedEmployees.length > 0 && (
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
@@ -681,17 +723,17 @@ const HRPayroll: React.FC = () => {
                     </TooltipTrigger>
                     <TooltipContent>Process payroll for selected employees</TooltipContent>
                   </Tooltip>
-                )}
+                )} */}
               </div>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[50px]">
+                    {/* <TableHead className="w-[50px]">
                       <Checkbox
                         checked={selectedEmployees.length === filteredPayroll.length && filteredPayroll.length > 0}
                         onCheckedChange={toggleSelectAll}
                       />
-                    </TableHead>
+                    </TableHead> */}
                     <TableHead>Employee ID</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Pay Days / LOP</TableHead>
@@ -703,12 +745,12 @@ const HRPayroll: React.FC = () => {
                 <TableBody>
                   {filteredPayroll.map(record => (
                     <TableRow key={record.id}>
-                      <TableCell>
+                      {/* <TableCell>
                         <Checkbox
                           checked={selectedEmployees.includes(record.employeeId)}
                           onCheckedChange={() => toggleSelectEmployee(record.employeeId)}
                         />
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell>{record.employeeId}</TableCell>
                       <TableCell>{record.employeeName}</TableCell>
                       <TableCell>{record.payDays} / {record.lopDays}</TableCell>
@@ -752,6 +794,17 @@ const HRPayroll: React.FC = () => {
               <CardDescription>View and manage employee-wise salary components</CardDescription>
             </CardHeader>
             <CardContent>
+              <div className="flex justify-between items-center mb-4">
+              <div className="relative w-64">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by name or ID..."
+                    className="pl-8"
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                  />
+                </div>
+              </div>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -765,21 +818,30 @@ const HRPayroll: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {employeeSalaryStructures.map(struct => (
-                    <TableRow key={struct.employeeId}>
-                      <TableCell>{struct.employeeId}</TableCell>
-                      <TableCell>{struct.employeeName}</TableCell>
-                      <TableCell>{formatCurrency(struct.ctc)}</TableCell>
-                      <TableCell>{formatCurrency(struct.grossSalary)}</TableCell>
-                      <TableCell>{formatCurrency(struct.basicSalary)}</TableCell>
-                      <TableCell>{formatCurrency(struct.hra)}</TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm" onClick={() => handleEditStructure(struct)}>
-                          <Edit className="h-4 w-4 mr-1" /> Edit/View
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {employeeSalaryStructures
+  .filter(struct =>
+    filteredPayroll.some(p => p.employeeId === struct.employeeId)
+  )
+  .map(struct => (
+    <TableRow key={struct.employeeId}>
+      <TableCell>{struct.employeeId}</TableCell>
+      <TableCell>{struct.employeeName}</TableCell>
+      <TableCell>{formatCurrency(struct.ctc)}</TableCell>
+      <TableCell>{formatCurrency(struct.grossSalary)}</TableCell>
+      <TableCell>{formatCurrency(struct.basicSalary)}</TableCell>
+      <TableCell>{formatCurrency(struct.hra)}</TableCell>
+      <TableCell>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => handleEditStructure(struct)}
+        >
+          <Edit className="h-4 w-4 mr-1" /> Edit/View
+        </Button>
+      </TableCell>
+    </TableRow>
+  ))}
+
                 </TableBody>
               </Table>
             </CardContent>
@@ -787,9 +849,9 @@ const HRPayroll: React.FC = () => {
         </TabsContent>
 
         {/* Reports Tab */}
-        <TabsContent value="reports">
+        <TabsContent value="statutory">
           <div className="space-y-6">
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Payroll Summary Report</CardTitle>
               </CardHeader>
@@ -883,9 +945,85 @@ const HRPayroll: React.FC = () => {
                   </TableBody>
                 </Table>
               </CardContent>
-            </Card>
+            </Card>*/}
+
+              <Card>
+            <CardHeader>
+              <CardTitle>Employee Statutory Deductions</CardTitle>
+              {/* <CardDescription>View and manage employee-wise salary components</CardDescription> */}
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-between items-center mb-4">
+              <div className="relative w-64">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by name or ID..."
+                    className="pl-8"
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                  />
+                </div>
+              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Employee ID</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>PF</TableHead>
+                    <TableHead>ESIC</TableHead>
+                    <TableHead>Professional Tax</TableHead>
+                    <TableHead>Income Tax</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {employeeSalaryStructures
+  .filter(struct =>
+    filteredPayroll.some(p => p.employeeId === struct.employeeId)
+  )
+  .map(struct => (
+                    <TableRow key={struct.employeeId}>
+                      <TableCell>{struct.employeeId}</TableCell>
+                      <TableCell>{struct.employeeName}</TableCell>
+                      {(() => {
+                          const key = `${struct.employeeId}-${selectedMonth}-${selectedYear}`;
+                          const ded = deductionsData[key];
+
+                          return (
+                            <>
+                              <TableCell>{formatCurrency((ded?.pfEmployee || 0) + (ded?.pfEmployer || 0))}</TableCell>
+                              <TableCell>{formatCurrency((ded?.esicEmployee || 0) + (ded?.esicEmployer || 0))}</TableCell>
+                              <TableCell>{formatCurrency(ded?.professionalTax || 0)}</TableCell>
+                              <TableCell>{formatCurrency(ded?.incomeTax || 0)}</TableCell>
+                            </>
+                          );
+                        })()}
+                         <TableCell>
+                        <Button variant="ghost" size="sm" onClick={() => handleStatutoryEditStructure(struct)}>
+                          <Edit className="h-4 w-4 mr-1" /> Edit/View
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                      {/* <TableCell>{formatCurrency(struct.pf)}</TableCell>
+                      <TableCell>{formatCurrency(struct.esic)}</TableCell>
+                      <TableCell>{formatCurrency(struct.professionalTax)}</TableCell>
+                      <TableCell>{formatCurrency(struct.incomeTax)}</TableCell>
+                      <TableCell>
+                        <Button variant="ghost" size="sm" onClick={() => handleStatutoryEditStructure(struct)}>
+                          <Edit className="h-4 w-4 mr-1" /> Edit/View
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))} */}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+
           </div>
-        </TabsContent>
+        </TabsContent> 
       </Tabs>
 
       {/* Employee Payroll Detail Dialog */}
@@ -893,18 +1031,30 @@ const HRPayroll: React.FC = () => {
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           {selectedEmployee && (
             <>
-              <DialogHeader>
+              {/* <DialogHeader>
                 <DialogTitle>Payslip Details – {selectedEmployee.employeeName} – {selectedEmployee.month} {selectedEmployee.year}</DialogTitle>
                 <DialogDescription>Net Pay: {formatCurrency(selectedEmployee.netPay)}</DialogDescription>
+              </DialogHeader> */}
+
+              <DialogHeader>
+                <DialogTitle>Payslip Details</DialogTitle>
+                <DialogTitle>Employee ID – {selectedEmployee.employeeId}</DialogTitle>
+                <DialogTitle>Employee Name – {selectedEmployee.employeeName}</DialogTitle>
+                <DialogTitle>Salary Month – {selectedEmployee.month} {selectedEmployee.year}</DialogTitle>
+                {/* <DialogDescription>Net Pay: {formatCurrency(selectedEmployee.netPay)}</DialogDescription> */}
               </DialogHeader>
 
-              <div className="grid grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 gap-6">
                 {/* Earnings */}
                 <div>
                   <h3 className="font-semibold mb-2">Earnings</h3>
                   <div className="space-y-2 text-sm">
+                    <div className="flex justify-between"><span>Pay Days</span><span>{(selectedEmployee.payDays)}</span></div>
+                    <div className="flex justify-between"><span>LOP Days</span><span>{(selectedEmployee.lopDays)}</span></div>
                     <div className="flex justify-between"><span>Gross Salary</span><span>{formatCurrency(selectedEmployee.grossSalary)}</span></div>
-                    {(() => {
+                    <div className="flex justify-between"><span>Total Deductions</span><span>{formatCurrency(selectedEmployee.totalDeductions)}</span></div>
+                    <div className="font-semibold mb-2 flex justify-between"><span>Net Pay</span><span>{formatCurrency(selectedEmployee.netPay)}</span></div>
+                    {/* {(() => {
                       const struct = employeeSalaryStructures.find(s => s.employeeId === selectedEmployee.employeeId);
                       return struct ? (
                         <>
@@ -917,12 +1067,12 @@ const HRPayroll: React.FC = () => {
                           <div className="flex justify-between"><span>Other Allowances</span><span>{formatCurrency(struct.otherAllowances)}</span></div>
                         </>
                       ) : null;
-                    })()}
+                    })()} */}
                   </div>
                 </div>
 
                 {/* Deductions */}
-                <div>
+                {/* <div>
                   <h3 className="font-semibold mb-2">Deductions</h3>
                   <div className="space-y-2 text-sm">
                     {(() => {
@@ -936,40 +1086,54 @@ const HRPayroll: React.FC = () => {
                       )) : null;
                     })()}
                   </div>
-                </div>
+                </div> */}
 
                 {/* Payment & Statutory */}
                 <div>
-                  <h3 className="font-semibold mb-2">Payment & Statutory Details</h3>
+                  <h3 className="font-semibold mb-2">Payment</h3>
                   <div className="space-y-2 text-sm">
-                    <div><Label>Payment Mode</Label><Input value={selectedEmployee.paymentMode} readOnly /></div>
-                    <div><Label>Bank Account</Label><Input value={selectedEmployee.bankAccountNumber} readOnly /></div>
-                    <div><Label>IFSC</Label><Input value={selectedEmployee.ifscCode} readOnly /></div>
+                    <div><Label>Payment Mode</Label><Select disabled={selectedEmployee.payslipGenerated}>
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Bank" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="Bank">Bank</SelectItem>
+                                          <SelectItem value="Cash">Cash</SelectItem>
+                                          <SelectItem value="Cheque">Cheque</SelectItem>
+                                        </SelectContent>
+                                      </Select></div>
+                    <div><Label>Bank Account Number</Label><Input value={selectedEmployee.bankAccountNumber} readOnly /></div>
+                    <div><Label>IFSC Code</Label><Input value={selectedEmployee.ifscCode} readOnly /></div>
                     <div><Label>Branch Name</Label><Input value={selectedEmployee.branchName} readOnly /></div>
                     <div><Label>Branch Address</Label><Input value={selectedEmployee.branchAddress} readOnly /></div>
-                    <div><Label>Aadhar</Label><Input value={selectedEmployee.aadhar} readOnly /></div>
+                    {/* <div><Label>Aadhar</Label><Input value={selectedEmployee.aadhar} readOnly /></div>
                     <div><Label>PAN</Label><Input value={selectedEmployee.pan} readOnly /></div>
                     <div><Label>UAN</Label><Input value={selectedEmployee.uan} readOnly /></div>
                     <div><Label>PF</Label><Input value={selectedEmployee.pf} readOnly /></div>
-                    <div><Label>ESI</Label><Input value={selectedEmployee.esi} readOnly /></div>
+                    <div><Label>ESI</Label><Input value={selectedEmployee.esi} readOnly /></div> */}
                   </div>
                 </div>
               </div>
 
-              <Separator className="my-4" />
+              {/* <Separator className="my-4" /> */}
 
               <div className="flex justify-end gap-2">
-                {!selectedEmployee.payslipGenerated && (
+                {/* {!selectedEmployee.payslipGenerated && (
                   <Button variant="outline" onClick={() => generatePayslip(selectedEmployee)}>
                     <FileCheck className="h-4 w-4 mr-2" /> Generate Payslip
                   </Button>
+                )} */}
+                {!selectedEmployee.payslipGenerated && (
+                  <Button variant="outline" onClick={null}>
+                    <FileCheck className="h-4 w-4 mr-2" /> Save
+                  </Button>
                 )}
-                <Button onClick={() => console.log('Initiate payment for', selectedEmployee.employeeId)}>
+                {/* <Button onClick={() => console.log('Initiate payment for', selectedEmployee.employeeId)}>
                   <IndianRupee className="h-4 w-4 mr-2" /> Proceed to Payment
                 </Button>
                 <Button onClick={() => console.log('Download PDF for', selectedEmployee.employeeId)}>
                   <Download className="h-4 w-4 mr-2" /> Download PDF
-                </Button>
+                </Button> */}
               </div>
             </>
           )}
@@ -1094,6 +1258,203 @@ const HRPayroll: React.FC = () => {
           )}
         </DialogContent>
       </Dialog>
+
+
+      <Dialog
+  open={!!selectedStatutoryEmployee}
+  onOpenChange={() => {
+    setSelectedStatutoryEmployee(null);
+    setEditingStatutory(null);
+  }}
+>
+  <DialogContent className="max-w-lg">
+    {editingStatutory && (
+      <>
+        <DialogHeader>
+          <DialogTitle>
+            Statutory Deductions – {selectedStatutoryEmployee?.employeeName}
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <Label>PF Employee</Label>
+            <Input
+              type="number"
+              value={editingStatutory.pfEmployee}
+              onChange={e =>
+                setEditingStatutory({ ...editingStatutory, pfEmployee: Number(e.target.value) })
+              }
+            />
+          </div>
+
+          <div>
+            <Label>PF Employer</Label>
+            <Input
+              type="number"
+              value={editingStatutory.pfEmployer}
+              onChange={e =>
+                setEditingStatutory({ ...editingStatutory, pfEmployer: Number(e.target.value) })
+              }
+            />
+          </div>
+
+          <div>
+            <Label>ESIC Employee</Label>
+            <Input
+              type="number"
+              value={editingStatutory.esicEmployee}
+              onChange={e =>
+                setEditingStatutory({ ...editingStatutory, esicEmployee: Number(e.target.value) })
+              }
+            />
+          </div>
+
+          <div>
+            <Label>ESIC Employer</Label>
+            <Input
+              type="number"
+              value={editingStatutory.esicEmployer}
+              onChange={e =>
+                setEditingStatutory({ ...editingStatutory, esicEmployer: Number(e.target.value) })
+              }
+            />
+          </div>
+
+          <div>
+            <Label>Professional Tax</Label>
+            <Input
+              type="number"
+              value={editingStatutory.professionalTax}
+              onChange={e =>
+                setEditingStatutory({ ...editingStatutory, professionalTax: Number(e.target.value) })
+              }
+            />
+          </div>
+
+          <div>
+            <Label>Income Tax</Label>
+            <Input
+              type="number"
+              value={editingStatutory.incomeTax}
+              onChange={e =>
+                setEditingStatutory({ ...editingStatutory, incomeTax: Number(e.target.value) })
+              }
+            />
+          </div>
+
+          <div>
+            <Label>TDS</Label>
+            <Input
+              type="number"
+              value={editingStatutory.tds}
+              onChange={e =>
+                setEditingStatutory({ ...editingStatutory, tds: Number(e.target.value) })
+              }
+            />
+          </div>
+
+           <div>
+            <Label>Labour Welfare Fund</Label>
+            <Input
+              type="number"
+              value={editingStatutory.labourWelfareFund}
+              onChange={e =>
+                setEditingStatutory({ ...editingStatutory, labourWelfareFund: Number(e.target.value) })
+              }
+            />
+          </div>
+
+          <div>
+            <Label>Salary Advance</Label>
+            <Input
+              type="number"
+              value={editingStatutory.salaryAdvance}
+              onChange={e =>
+                setEditingStatutory({ ...editingStatutory, salaryAdvance: Number(e.target.value) })
+              }
+            />
+          </div>
+
+          <div>
+            <Label>Tour Advance</Label>
+            <Input
+              type="number"
+              value={editingStatutory.tourAdvance}
+              onChange={e =>
+                setEditingStatutory({ ...editingStatutory, tourAdvance: Number(e.target.value) })
+              }
+            />
+          </div>
+
+          <div>
+            <Label>Medical Advance</Label>
+            <Input
+              type="number"
+              value={editingStatutory.medicalAdvance}
+              onChange={e =>
+                setEditingStatutory({ ...editingStatutory, medicalAdvance: Number(e.target.value) })
+              }
+            />
+          </div>
+
+          <div>
+            <Label>Festival Advance</Label>
+            <Input
+              type="number"
+              value={editingStatutory.festivalAdvance}
+              onChange={e =>
+                setEditingStatutory({ ...editingStatutory, festivalAdvance: Number(e.target.value) })
+              }
+            />
+          </div>
+
+          <div>
+            <Label>Excess Paid Last Month</Label>
+            <Input
+              type="number"
+              value={editingStatutory.excessPaidLastMonth}
+              onChange={e =>
+                setEditingStatutory({ ...editingStatutory, excessPaidLastMonth: Number(e.target.value) })
+              }
+            />
+          </div>
+
+          <div>
+            <Label>Employee Contribution - Group Health Insurance</Label>
+            <Input
+              type="number"
+              value={editingStatutory.employeeContributionGroupHealthInsurance}
+              onChange={e =>
+                setEditingStatutory({ ...editingStatutory, employeeContributionGroupHealthInsurance: Number(e.target.value) })
+              }
+            />
+          </div>
+
+          <div>
+            <Label>Employee Contribution - Group Accidental Insurance</Label>
+            <Input
+              type="number"
+              value={editingStatutory.employeeContributionGroupAccidentalInsurance}
+              onChange={e =>
+                setEditingStatutory({ ...editingStatutory, employeeContributionGroupAccidentalInsurance: Number(e.target.value) })
+              }
+            />
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button onClick={handleSaveStatutory}>
+            <Save className="h-4 w-4 mr-2" /> Save
+          </Button>
+        </DialogFooter>
+      </>
+    )}
+  </DialogContent>
+</Dialog>
+
+
+
     </div>
   );
 };

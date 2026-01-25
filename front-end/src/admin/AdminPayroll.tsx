@@ -2,7 +2,7 @@
 // Limited to viewing payrolls for assigned branch (e.g., Hyderabad Main)
 // No editing, no processing - focus on branch reports and summaries
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Eye,
   Download,
@@ -241,6 +241,12 @@ const AdminPayroll: React.FC = () => {
     }
   };
 
+
+  useEffect(() => {
+    // Reset to first tab on month/year change
+    setActiveTab('payroll-view');
+  }, [selectedMonth, selectedYear]);
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
@@ -346,13 +352,13 @@ const AdminPayroll: React.FC = () => {
                       <TableCell>{getStatusBadge(record.status)}</TableCell>
                       <TableCell>
                         <Button variant="ghost" size="sm" onClick={() => setSelectedEmployee(record)}>
-                          <Eye className="h-4 w-4 mr-1" /> View Details
+                          <Eye className="h-4 w-4 mr-1" /> View
                         </Button>
-                        {record.payslipGenerated && (
+                        {/* {record.payslipGenerated && (
                           <Button variant="ghost" size="sm" onClick={() => console.log('Download payslip for', record.employeeId)}>
                             <Download className="h-4 w-4 mr-1" /> Payslip
                           </Button>
-                        )}
+                        )} */}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -404,7 +410,7 @@ const AdminPayroll: React.FC = () => {
             </Card>
 
             {/* Employee Payslip Report */}
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Employee Payslip Report</CardTitle>
               </CardHeader>
@@ -436,7 +442,7 @@ const AdminPayroll: React.FC = () => {
                   </TableBody>
                 </Table>
               </CardContent>
-            </Card>
+            </Card> */}
 
             {/* Statutory Compliance Report */}
             <Card>
@@ -481,7 +487,7 @@ const AdminPayroll: React.FC = () => {
             <>
               <DialogHeader>
                 <DialogTitle>Payslip Details – {selectedEmployee.employeeName} – {selectedEmployee.month} {selectedEmployee.year}</DialogTitle>
-                <DialogDescription>Net Pay: {formatCurrency(selectedEmployee.netPay)} | Branch: {selectedEmployee.branch}</DialogDescription>
+                <DialogDescription>Branch: {selectedEmployee.branch}</DialogDescription>
               </DialogHeader>
 
               <div className="grid grid-cols-3 gap-6">
@@ -498,27 +504,35 @@ const AdminPayroll: React.FC = () => {
                   <h3 className="font-semibold mb-2">Deductions</h3>
                   <div className="space-y-2 text-sm">
                     {/* Dynamic from deductionsData */}
+                    <div className="flex justify-between"><span>Total Deductions</span><span>{formatCurrency(selectedEmployee.totalDeductions)}</span></div>
+                  </div>
+                </div>
+                 <div>
+                  <h3 className="font-semibold mb-2">Net Pay</h3>
+                  <div className="space-y-2 text-sm">
+                    {/* Dynamic from deductionsData */}
+                    <div className="flex justify-between"><span>Net Pay</span><span>{formatCurrency(selectedEmployee.netPay)}</span></div>
                   </div>
                 </div>
                 {/* Payment & Statutory */}
-                <div>
-                  <h3 className="font-semibold mb-2">Payment & Statutory Details</h3>
-                  <div className="space-y-2 text-sm">
-                    <div><Label>Branch</Label><Input value={selectedEmployee.branch} readOnly /></div>
+                {/* <div> */}
+                  {/* <h3 className="font-semibold mb-2">Payment & Statutory Details</h3> */}
+                  {/* <div className="space-y-2 text-sm"> */}
+                    {/* <div><Label>Branch</Label><Input value={selectedEmployee.branch} readOnly /></div> */}
                     {/* Other fields */}
-                  </div>
-                </div>
+                  {/* </div> */}
+                {/* </div> */}
               </div>
 
               <Separator className="my-4" />
 
-              <div className="flex justify-end gap-2">
+              {/* <div className="flex justify-end gap-2">
                 {selectedEmployee.payslipGenerated && (
                   <Button onClick={() => console.log('Download PDF for', selectedEmployee.employeeId)}>
                     <Download className="h-4 w-4 mr-2" /> Download PDF
                   </Button>
                 )}
-              </div>
+              </div> */}
             </>
           )}
         </DialogContent>
