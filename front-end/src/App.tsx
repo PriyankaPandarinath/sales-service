@@ -10,7 +10,7 @@ import Dashboard from "@/dashboards/DashboardRouter";
 import Employees from "@/employee/Employees";
 import Attendance from "@/employee/Attendance";
 import Leave from "@/employee/Leave";
-import Payroll from "@/employee/Payroll";
+// import Payroll from "@/employee/EmployeePayslips";
 import Performance from "@/employee/Performance";
 
 import NotFound from "./employee/NotFound";
@@ -21,6 +21,10 @@ import Grievance from "./employee/Grievance";
 import Settings from "./employee/Settings";
 import Profile from "./employee/Profile";
 import Help from "./components/Help";
+import Payroll from "./hr/HRPayroll";
+
+import AdminPayroll from "./admin/AdminPayroll";
+
 
 import OrganizationLayout from "@/organization/OrganizationLayout";
 import UserManagement from "@/super-admin/UserManagement";
@@ -62,6 +66,7 @@ const App = () => (
               <Route path="/profile" element={<Profile />} />
               <Route path="/help" element={<Help />} />
               <Route path="/users" element={<UserManagement />} />
+              <Route path="/adminpayroll" element={<AdminPayroll />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

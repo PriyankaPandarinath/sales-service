@@ -44,7 +44,9 @@ const navItems: NavItem[] = [
   { title: 'Employees', href: '/employees', icon: Users, roles: ['SUPERADMIN','ADMIN', 'HR', 'MANAGER'] },
   // { title: 'Attendance', href: '/attendance', icon: Clock, roles: ['ADMIN', 'EMPLOYEE', 'HR', 'MANAGER'] },
   // { title: 'Leave', href: '/leave', icon: Calendar, badge: '3', roles: ['ADMIN', 'EMPLOYEE', 'HR', 'MANAGER'] },
-  // { title: 'Payroll', href: '/payroll', icon: Wallet, roles: ['EMPLOYEE', 'HR', 'MANAGER'] },
+  { title: 'Payroll', href: '/payroll', icon: Wallet, roles: ['HR'] },
+    { title: 'Payroll', href: '/adminpayroll', icon: Wallet, roles: ['ADMIN'] },
+
   // { title: 'Recruitment', href: '/recruitment', icon: UserPlus, roles: ['HR'] },
   // { title: 'Performance', href: '/performance', icon: Target, roles: ['EMPLOYEE', 'HR', 'MANAGER'] },
   // { title: 'Training', href: '/training', icon: GraduationCap, roles: ['EMPLOYEE', 'HR', 'MANAGER'] },
