@@ -42,7 +42,7 @@ const navItems: NavItem[] = [
   { title: 'Organization', href: '/organization', icon: Building2, roles: ['SUPERADMIN'] },
     { title: "Users", href: "/users", icon: Users, roles: ["SUPERADMIN", 'ADMIN'] },
   { title: 'Employees', href: '/employees', icon: Users, roles: ['SUPERADMIN','ADMIN', 'HR', 'MANAGER'] },
-  // { title: 'Attendance', href: '/attendance', icon: Clock, roles: ['ADMIN', 'EMPLOYEE', 'HR', 'MANAGER'] },
+  { title: 'Attendance', href: '/eattendance', icon: Clock, roles: ['ADMIN', 'EMPLOYEE', 'HR', 'MANAGER'] },
   // { title: 'Leave', href: '/leave', icon: Calendar, badge: '3', roles: ['ADMIN', 'EMPLOYEE', 'HR', 'MANAGER'] },
   { title: 'Payroll', href: '/payroll', icon: Wallet, roles: ['HR'] },
     { title: 'Payroll', href: '/adminpayroll', icon: Wallet, roles: ['ADMIN'] },

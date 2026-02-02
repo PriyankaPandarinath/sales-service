@@ -27,7 +27,7 @@ import AdminPayroll from "./admin/AdminPayroll";
 
 
 import OrganizationLayout from "@/organization/OrganizationLayout";
-import UserManagement from "@/super-admin/UserManagement";
+import UserManagement from "@/superadmin/UserManagement";
 import EmployeePayslips from "./employee/EmployeePayslips";
 import PayrollAudit from "./superadmin/PayrollAudit";
 
@@ -49,7 +49,7 @@ const App = () => (
             <Route element={<MainLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/employees" element={<Employees />} />
-              <Route path="/attendance" element={<Attendance />} />
+              <Route path="/eattendance" element={<Attendance />} />
               <Route path="/leave" element={<Leave />} />
               <Route path="/payroll" element={<Payroll />} />
               {/* <Route path="/organization" element={<Dashboard />} /> */}

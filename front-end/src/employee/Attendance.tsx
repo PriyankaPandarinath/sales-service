@@ -172,14 +172,27 @@ const Attendance: React.FC = () => {
   const [attendanceData, setAttendanceData] = useState<AttendanceRecord[]>([]);
   const [todayAttendance, setTodayAttendance] = useState<AttendanceRecord | null>(null);
   const [loading, setLoading] = useState(false);
-  const [stats, setStats] = useState({
-  PRESENT: 0,
-  ABSENT: 0,
-  LATE: 0,
-  ON_LEAVE: 0,
-  HALF_DAY: 0,
-  HOLIDAY: 0,
-});
+  const [hasPunchedInToday, setHasPunchedInToday] = useState(false);
+const [hasPunchedOutToday, setHasPunchedOutToday] = useState(false);
+
+//   const [stats, setStats] = useState({
+//   PRESENT: 0,
+//   ABSENT: 0,
+//   LATE: 0,
+//   ON_LEAVE: 0,
+//   HALF_DAY: 0,
+//   HOLIDAY: 0,
+// });
+
+const [stats, setStats] = useState<null | {
+  PRESENT: number;
+  ABSENT: number;
+  LATE: number;
+  ON_LEAVE: number;
+  HALF_DAY: number;
+  HOLIDAY: number;
+}>(null);
+
 
   const today = new Date();
   const isWeekend = today.getDay() === 0 || today.getDay() === 6;
@@ -210,6 +223,9 @@ const Attendance: React.FC = () => {
     const todayRecord = response.data.items.find(
       (r: AttendanceRecord) => r.date === today
     );
+
+    setHasPunchedInToday(response.data.TODAY_PUNCH_IN === true);
+    setHasPunchedOutToday(response.data.TODAY_PUNCH_OUT === true);
 
     setTodayAttendance(todayRecord || null);
 
@@ -360,12 +376,25 @@ useEffect(() => {
 
             <div className="flex gap-2">
               <Button onClick={handlePunchIn} className="bg-success hover:bg-success/90" 
-              disabled={isWeekend || !!todayAttendance?.punch_in}>
+              disabled={
+                  loading ||
+                  isWeekend ||
+                  hasPunchedInToday
+                }
+                >
                 <CheckCircle2 className="h-4 w-4 mr-2" />
                 Punch In
               </Button>
+
+
               <Button onClick={handlePunchOut} className="bg-destructive hover:bg-destructive/90"
-              disabled={isWeekend || !todayAttendance?.punch_in ||!!todayAttendance?.punch_out}>
+              disabled={
+                  loading ||
+                  isWeekend ||
+                  !hasPunchedInToday ||
+                  hasPunchedOutToday
+                }
+                >
                 <XCircle className="h-4 w-4 mr-2" />
                 Punch Out
               </Button>
@@ -375,10 +404,10 @@ useEffect(() => {
       </Card>
 
       {/* Stats (UNCHANGED) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"> */}
 
   {/* PRESENT */}
-  <Card className="card-hover">
+  {/* <Card className="card-hover">
     <CardContent className="p-6">
       <div className="flex items-center justify-between">
         <div>
@@ -390,10 +419,10 @@ useEffect(() => {
         </div>
       </div>
     </CardContent>
-  </Card>
+  </Card> */}
 
   {/* ABSENT */}
-  <Card className="card-hover">
+  {/* <Card className="card-hover">
     <CardContent className="p-6">
       <div className="flex items-center justify-between">
         <div>
@@ -405,10 +434,10 @@ useEffect(() => {
         </div>
       </div>
     </CardContent>
-  </Card>
+  </Card> */}
 
   {/* LATE */}
-  <Card className="card-hover">
+  {/* <Card className="card-hover">
     <CardContent className="p-6">
       <div className="flex items-center justify-between">
         <div>
@@ -420,10 +449,10 @@ useEffect(() => {
         </div>
       </div>
     </CardContent>
-  </Card>
+  </Card> */}
 
   {/* ON LEAVE */}
-  <Card className="card-hover">
+  {/* <Card className="card-hover">
     <CardContent className="p-6">
       <div className="flex items-center justify-between">
         <div>
@@ -435,9 +464,57 @@ useEffect(() => {
         </div>
       </div>
     </CardContent>
-  </Card>
+  </Card> */}
 
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  {stats === null ? (
+    Array.from({ length: 4 }).map((_, i) => (
+      <Card key={i} className="card-hover">
+        <CardContent className="p-6">
+          <div className="h-6 w-24 bg-muted rounded mb-2 animate-pulse" />
+          <div className="h-8 w-16 bg-muted rounded animate-pulse" />
+        </CardContent>
+      </Card>
+    ))
+  ) : (
+    <>
+      {/* PRESENT */}
+      <Card className="card-hover">
+        <CardContent className="p-6">
+          <p className="text-sm text-muted-foreground">Present</p>
+          <p className="text-2xl font-bold mt-1">{stats.PRESENT}</p>
+        </CardContent>
+      </Card>
+
+      {/* ABSENT */}
+      <Card className="card-hover">
+        <CardContent className="p-6">
+          <p className="text-sm text-muted-foreground">Absent</p>
+          <p className="text-2xl font-bold mt-1">{stats.ABSENT}</p>
+        </CardContent>
+      </Card>
+
+      {/* LATE */}
+      <Card className="card-hover">
+        <CardContent className="p-6">
+          <p className="text-sm text-muted-foreground">Late</p>
+          <p className="text-2xl font-bold mt-1">{stats.LATE}</p>
+        </CardContent>
+      </Card>
+
+      {/* ON LEAVE */}
+      <Card className="card-hover">
+        <CardContent className="p-6">
+          <p className="text-sm text-muted-foreground">On Leave</p>
+          <p className="text-2xl font-bold mt-1">{stats.ON_LEAVE}</p>
+        </CardContent>
+      </Card>
+    </>
+  )}
 </div>
+
+
+{/* </div> */}
 
 
       {/* <Card> */}
@@ -521,13 +598,21 @@ useEffect(() => {
 
               <TableBody>
 
-                                {loading && (
+                                {/* {loading && (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center">
                       Loading attendance...
                     </TableCell>
                   </TableRow>
-                )}
+                )} */}
+                {!loading && filteredData.length === 0 && (
+  <TableRow>
+    <TableCell colSpan={7} className="text-center text-muted-foreground">
+      No attendance records found
+    </TableCell>
+  </TableRow>
+)}
+
 
 
                 {filteredData.map((record) => {
@@ -583,7 +668,7 @@ useEffect(() => {
               <Button
   variant="outline"
   size="sm"
-  disabled={page === 1}
+  disabled={loading || page === 1}
   onClick={() => setPage((p) => p - 1)}
 >
   <ChevronLeft className="h-4 w-4 mr-1" />
@@ -593,7 +678,7 @@ useEffect(() => {
 <Button
   variant="outline"
   size="sm"
-  disabled={page === totalPages}
+  disabled={loading || page === totalPages}
   onClick={() => setPage((p) => p + 1)}
 >
   Next
